@@ -1,0 +1,103 @@
+import { Project } from '../types';
+
+export const sampleProject: Project = {
+  id: 'proj-001',
+  title: 'The Fall of Constantinople',
+  subtitle: 'The End of an Empire',
+  year: '1453',
+  description: 'A comprehensive documentary exploring the siege and fall of Constantinople in 1453, marking the end of the Byzantine Empire and the rise of the Ottoman Empire under Sultan Mehmed II.',
+  createdAt: '2024-01-15T10:30:00Z',
+  updatedAt: '2024-03-22T14:45:00Z',
+  status: 'active',
+  sections: [
+    {
+      id: 'research',
+      name: 'Research',
+      icon: 'BookOpen',
+      description: 'Historical research, academic sources, and primary documents',
+      status: 'in-progress',
+    },
+    {
+      id: 'sources',
+      name: 'Sources',
+      icon: 'FileText',
+      description: 'Primary and secondary source materials',
+      status: 'in-progress',
+    },
+    {
+      id: 'script',
+      name: 'Script',
+      icon: 'PenTool',
+      description: 'Narrative script and scene descriptions',
+      status: 'empty',
+    },
+    {
+      id: 'characters',
+      name: 'Characters',
+      icon: 'Users',
+      description: 'Key historical figures and their roles',
+      status: 'empty',
+    },
+    {
+      id: 'scenes',
+      name: 'Scenes',
+      icon: 'Film',
+      description: 'Scene breakdowns and visual storyboards',
+      status: 'empty',
+    },
+    {
+      id: 'voiceover',
+      name: 'Voiceover',
+      icon: 'Mic',
+      description: 'Narration scripts and voice talent notes',
+      status: 'empty',
+    },
+    {
+      id: 'visuals',
+      name: 'Visuals',
+      icon: 'Image',
+      description: 'Visual assets, maps, illustrations, and reconstructions',
+      status: 'empty',
+    },
+    {
+      id: 'timeline',
+      name: 'Timeline',
+      icon: 'Clock',
+      description: 'Chronological timeline of events',
+      status: 'empty',
+    },
+    {
+      id: 'export',
+      name: 'Export',
+      icon: 'Download',
+      description: 'Export settings and final output configuration',
+      status: 'empty',
+    },
+  ],
+};
+
+export const sampleProjects: Project[] = [
+  sampleProject,
+  {
+    id: 'proj-002',
+    title: 'The Silk Road',
+    subtitle: 'Trade Routes of the Ancient World',
+    year: '200 BCE – 1453 CE',
+    description: 'Exploring the vast network of trade routes that connected East and West.',
+    createdAt: '2024-02-10T08:00:00Z',
+    updatedAt: '2024-02-28T16:20:00Z',
+    status: 'draft',
+    sections: [],
+  },
+  {
+    id: 'proj-003',
+    title: 'The Library of Alexandria',
+    subtitle: 'Knowledge Lost to Time',
+    year: '3rd Century BCE',
+    description: 'The story of the ancient world\'s greatest repository of knowledge.',
+    createdAt: '2023-11-05T12:00:00Z',
+    updatedAt: '2024-01-10T09:30:00Z',
+    status: 'archived',
+    sections: [],
+  },
+];
