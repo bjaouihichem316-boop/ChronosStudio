@@ -5,6 +5,7 @@ import { ProductionData } from '../../types/production';
 import { AIData } from '../../types/ai';
 import { VisualBibleData } from '../../types/visual-bible';
 import { PipelineData } from '../../types/pipeline';
+import { MediaData } from '../../types/media';
 import {
   BookOpen,
   FileText,
@@ -25,6 +26,7 @@ import ProductionWorkspace from './production/ProductionWorkspace';
 import AIWorkspace from './ai/AIWorkspace';
 import VisualBibleWorkspace from './visual-bible/VisualBibleWorkspace';
 import PipelineWorkspace from './pipeline/PipelineWorkspace';
+import MediaWorkspace from './media/MediaWorkspace';
 
 interface ProjectOverviewProps {
   project: Project;
@@ -42,6 +44,8 @@ interface ProjectOverviewProps {
   onUpdateVisualBibleData: (data: VisualBibleData) => void;
   pipelineData: PipelineData | null;
   onUpdatePipelineData: (data: PipelineData) => void;
+  mediaData: MediaData | null;
+  onUpdateMediaData: (data: MediaData) => void;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -72,6 +76,8 @@ export default function ProjectOverview({
   onUpdateVisualBibleData,
   pipelineData,
   onUpdatePipelineData,
+  mediaData,
+  onUpdateMediaData,
 }: ProjectOverviewProps) {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
@@ -170,6 +176,16 @@ export default function ProjectOverview({
               />
             ) : (
               <EmptyPipelineSection projectTitle={project.title} />
+            )
+          ) : activeSection === 'media' ? (
+            mediaData ? (
+              <MediaWorkspace
+                mediaData={mediaData}
+                pipelineData={pipelineData!}
+                onUpdateMediaData={onUpdateMediaData}
+              />
+            ) : (
+              <EmptyMediaSection projectTitle={project.title} />
             )
           ) : (
             <SectionContent
@@ -505,6 +521,42 @@ function EmptyPipelineSection({ projectTitle }: { projectTitle: string }) {
             <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors">
               <Sparkles className="w-4 h-4" />
               Go to AI Workspace
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmptyMediaSection({ projectTitle }: { projectTitle: string }) {
+  return (
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-12 h-12 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center">
+          <Image className="w-6 h-6 text-blue-400" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-white">Media Assets</h2>
+          <p className="text-sm text-gray-400">Generated and imported media management</p>
+        </div>
+      </div>
+      <div className="bg-[#1a1b2e] border border-[#2a2b3d] rounded-xl p-8">
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#22234a] flex items-center justify-center mx-auto mb-4">
+            <Image className="w-8 h-8 text-gray-500" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-300 mb-2">
+            Media Assets
+          </h3>
+          <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
+            The media asset library for <span className="text-gray-400">{projectTitle}</span> is ready.
+            Complete generation tasks to create media assets.
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors">
+              <Sparkles className="w-4 h-4" />
+              Go to Pipeline
             </button>
           </div>
         </div>
