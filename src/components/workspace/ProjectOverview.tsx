@@ -4,6 +4,7 @@ import { ScriptData } from '../../types/script';
 import { ProductionData } from '../../types/production';
 import { AIData } from '../../types/ai';
 import { VisualBibleData } from '../../types/visual-bible';
+import { PipelineData } from '../../types/pipeline';
 import {
   BookOpen,
   FileText,
@@ -23,6 +24,7 @@ import ScriptWorkspace from './script/ScriptWorkspace';
 import ProductionWorkspace from './production/ProductionWorkspace';
 import AIWorkspace from './ai/AIWorkspace';
 import VisualBibleWorkspace from './visual-bible/VisualBibleWorkspace';
+import PipelineWorkspace from './pipeline/PipelineWorkspace';
 
 interface ProjectOverviewProps {
   project: Project;
@@ -38,6 +40,8 @@ interface ProjectOverviewProps {
   onUpdateAIData: (data: AIData) => void;
   visualBibleData: VisualBibleData | null;
   onUpdateVisualBibleData: (data: VisualBibleData) => void;
+  pipelineData: PipelineData | null;
+  onUpdatePipelineData: (data: PipelineData) => void;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -66,6 +70,8 @@ export default function ProjectOverview({
   onUpdateAIData,
   visualBibleData,
   onUpdateVisualBibleData,
+  pipelineData,
+  onUpdatePipelineData,
 }: ProjectOverviewProps) {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
@@ -150,6 +156,20 @@ export default function ProjectOverview({
               />
             ) : (
               <EmptyVisualBibleSection projectTitle={project.title} />
+            )
+          ) : activeSection === 'pipeline' ? (
+            pipelineData ? (
+              <PipelineWorkspace
+                pipelineData={pipelineData}
+                aiData={aiData!}
+                productionData={productionData!}
+                visualBibleData={visualBibleData!}
+                researchData={researchData!}
+                scriptData={scriptData!}
+                onUpdateData={onUpdatePipelineData}
+              />
+            ) : (
+              <EmptyPipelineSection projectTitle={project.title} />
             )
           ) : (
             <SectionContent
@@ -449,6 +469,42 @@ function EmptyResearchSection({ projectTitle }: { projectTitle: string }) {
             </button>
             <button className="px-4 py-2 bg-[#22234a] hover:bg-[#2a2b3d] text-gray-300 text-sm font-medium rounded-lg border border-[#2a2b3d] transition-colors">
               Start Manually
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmptyPipelineSection({ projectTitle }: { projectTitle: string }) {
+  return (
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-12 h-12 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center">
+          <Clock className="w-6 h-6 text-purple-400" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-white">Generation Pipeline</h2>
+          <p className="text-sm text-gray-400">AI generation task management and execution</p>
+        </div>
+      </div>
+      <div className="bg-[#1a1b2e] border border-[#2a2b3d] rounded-xl p-8">
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#22234a] flex items-center justify-center mx-auto mb-4">
+            <Clock className="w-8 h-8 text-gray-500" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-300 mb-2">
+            Generation Pipeline
+          </h3>
+          <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
+            The generation pipeline for <span className="text-gray-400">{projectTitle}</span> is ready.
+            Create generation requests in the AI workspace to start building your pipeline.
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors">
+              <Sparkles className="w-4 h-4" />
+              Go to AI Workspace
             </button>
           </div>
         </div>

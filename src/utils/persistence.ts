@@ -11,6 +11,7 @@ import { ScriptData } from '../types/script';
 import { ProductionData } from '../types/production';
 import { AIData } from '../types/ai';
 import { VisualBibleData } from '../types/visual-bible';
+import { PipelineData } from '../types/pipeline';
 import { Project } from '../types';
 
 // Storage key prefixes
@@ -18,7 +19,7 @@ const STORAGE_PREFIX = 'chronos:project';
 const PROJECTS_KEY = 'chronos:projects';
 
 // Domain keys
-type Domain = 'research' | 'script' | 'production' | 'ai' | 'visual-bible';
+type Domain = 'research' | 'script' | 'production' | 'ai' | 'visual-bible' | 'pipeline';
 
 /**
  * Build a project-scoped storage key
@@ -126,6 +127,16 @@ export function saveVisualBibleData(projectId: string, data: VisualBibleData): v
   safeWrite(buildKey(projectId, 'visual-bible'), data);
 }
 
+// ─── Pipeline ────────────────────────────────────────────────────────────────
+
+export function loadPipelineData(projectId: string): PipelineData | null {
+  return safeRead<PipelineData>(buildKey(projectId, 'pipeline'));
+}
+
+export function savePipelineData(projectId: string, data: PipelineData): void {
+  safeWrite(buildKey(projectId, 'pipeline'), data);
+}
+
 // ─── Cleanup ─────────────────────────────────────────────────────────────────
 
 /**
@@ -138,6 +149,7 @@ export function clearProjectData(projectId: string): void {
     localStorage.removeItem(buildKey(projectId, 'production'));
     localStorage.removeItem(buildKey(projectId, 'ai'));
     localStorage.removeItem(buildKey(projectId, 'visual-bible'));
+    localStorage.removeItem(buildKey(projectId, 'pipeline'));
   } catch {
     // Ignore errors
   }
@@ -153,6 +165,7 @@ export function loadProjectData(projectId: string): {
   production: ProductionData | null;
   ai: AIData | null;
   visualBible: VisualBibleData | null;
+  pipeline: PipelineData | null;
 } {
   return {
     research: loadResearchData(projectId),
@@ -160,5 +173,6 @@ export function loadProjectData(projectId: string): {
     production: loadProductionData(projectId),
     ai: loadAIData(projectId),
     visualBible: loadVisualBibleData(projectId),
+    pipeline: loadPipelineData(projectId),
   };
 }
