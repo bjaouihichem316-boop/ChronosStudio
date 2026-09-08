@@ -2,6 +2,8 @@
 
 **AI-Assisted Documentary Production Workspace**
 
+🌐 **Repository:** https://github.com/bjaouihichem316-boop/ChronosStudio
+
 Chronos Studio is a professional web application for creating historical documentaries with AI assistance. It provides a structured workflow from historical research through script writing to production planning, with intelligent tools to help filmmakers craft compelling historical narratives.
 
 ## 🎬 Overview

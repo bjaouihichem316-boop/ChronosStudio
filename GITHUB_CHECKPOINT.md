@@ -2,6 +2,7 @@
 
 **Date:** 2024
 **Stage:** Stage 4 Complete — Production Studio Foundation
+**Repository:** https://github.com/bjaouihichem316-boop/ChronosStudio
 **Status:** ✅ Ready for Commit and Push
 
 ---
