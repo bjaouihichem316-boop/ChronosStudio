@@ -2,6 +2,7 @@ import { Project, ProjectSection } from '../../types';
 import { ResearchData } from '../../types/research';
 import { ScriptData } from '../../types/script';
 import { ProductionData } from '../../types/production';
+import { AIData } from '../../types/ai';
 import {
   BookOpen,
   FileText,
@@ -19,6 +20,7 @@ import ResearchWorkspace from './research/ResearchWorkspace';
 import ResearchProgressIndicator from './research/ResearchProgressIndicator';
 import ScriptWorkspace from './script/ScriptWorkspace';
 import ProductionWorkspace from './production/ProductionWorkspace';
+import AIWorkspace from './ai/AIWorkspace';
 
 interface ProjectOverviewProps {
   project: Project;
@@ -30,6 +32,8 @@ interface ProjectOverviewProps {
   onUpdateScriptData: (data: ScriptData) => void;
   productionData: ProductionData | null;
   onUpdateProductionData: (data: ProductionData) => void;
+  aiData: AIData | null;
+  onUpdateAIData: (data: AIData) => void;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -54,6 +58,8 @@ export default function ProjectOverview({
   onUpdateScriptData,
   productionData,
   onUpdateProductionData,
+  aiData,
+  onUpdateAIData,
 }: ProjectOverviewProps) {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
@@ -113,6 +119,19 @@ export default function ProjectOverview({
               />
             ) : (
               <EmptyProductionSection projectTitle={project.title} />
+            )
+          ) : activeSection === 'ai' ? (
+            aiData ? (
+              <AIWorkspace
+                data={aiData}
+                project={project}
+                researchData={researchData!}
+                scriptData={scriptData!}
+                productionData={productionData!}
+                onUpdateData={onUpdateAIData}
+              />
+            ) : (
+              <EmptyAISection projectTitle={project.title} />
             )
           ) : (
             <SectionContent
@@ -412,6 +431,42 @@ function EmptyResearchSection({ projectTitle }: { projectTitle: string }) {
             </button>
             <button className="px-4 py-2 bg-[#22234a] hover:bg-[#2a2b3d] text-gray-300 text-sm font-medium rounded-lg border border-[#2a2b3d] transition-colors">
               Start Manually
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmptyAISection({ projectTitle }: { projectTitle: string }) {
+  return (
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-12 h-12 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center">
+          <Sparkles className="w-6 h-6 text-purple-400" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-white">AI Generation Center</h2>
+          <p className="text-sm text-gray-400">AI-powered generation for your documentary</p>
+        </div>
+      </div>
+      <div className="bg-[#1a1b2e] border border-[#2a2b3d] rounded-xl p-8">
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#22234a] flex items-center justify-center mx-auto mb-4">
+            <Sparkles className="w-8 h-8 text-gray-500" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-300 mb-2">
+            AI Generation Center
+          </h3>
+          <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
+            The AI generation center for <span className="text-gray-400">{projectTitle}</span> is ready.
+            Create generation requests from your production shots, scenes, characters, and locations.
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors">
+              <Sparkles className="w-4 h-4" />
+              Initialize AI Center
             </button>
           </div>
         </div>

@@ -3,10 +3,12 @@ import { Project } from './types';
 import { ResearchData } from './types/research';
 import { ScriptData } from './types/script';
 import { ProductionData } from './types/production';
+import { AIData } from './types/ai';
 import { sampleProjects } from './data/sampleProject';
 import { constantinopleResearchData } from './data/researchData';
 import { constantinopleScriptData } from './data/scriptData';
 import { constantinopleProductionData } from './data/productionData';
+import { builtInPresets } from './data/aiPresets';
 import {
   loadProjects,
   saveProjects,
@@ -14,6 +16,7 @@ import {
   saveResearchData,
   saveScriptData,
   saveProductionData,
+  saveAIData,
   clearProjectData,
 } from './utils/persistence';
 import Sidebar from './components/layout/Sidebar';
@@ -42,6 +45,15 @@ function emptyProductionData(): ProductionData {
   };
 }
 
+function emptyAIData(): AIData {
+  return {
+    requests: [],
+    jobs: [],
+    presets: [...builtInPresets],
+    lastSaved: new Date().toISOString(),
+  };
+}
+
 /**
  * Initialize the data maps from localStorage, falling back to sample data
  * for the first project if nothing is persisted yet.
@@ -50,10 +62,12 @@ function initializeDataMaps(projects: Project[]): {
   research: Record<string, ResearchData>;
   script: Record<string, ScriptData>;
   production: Record<string, ProductionData>;
+  ai: Record<string, AIData>;
 } {
   const researchMap: Record<string, ResearchData> = {};
   const scriptMap: Record<string, ScriptData> = {};
   const productionMap: Record<string, ProductionData> = {};
+  const aiMap: Record<string, AIData> = {};
 
   for (const project of projects) {
     const persisted = loadProjectData(project.id);
@@ -84,9 +98,16 @@ function initializeDataMaps(projects: Project[]): {
     } else {
       productionMap[project.id] = emptyProductionData();
     }
+
+    // AI: persisted → empty (with built-in presets)
+    if (persisted.ai) {
+      aiMap[project.id] = persisted.ai;
+    } else {
+      aiMap[project.id] = emptyAIData();
+    }
   }
 
-  return { research: researchMap, script: scriptMap, production: productionMap };
+  return { research: researchMap, script: scriptMap, production: productionMap, ai: aiMap };
 }
 
 export default function App() {
@@ -102,6 +123,7 @@ export default function App() {
   const [researchDataMap, setResearchDataMap] = useState<Record<string, ResearchData>>(initialData.research);
   const [scriptDataMap, setScriptDataMap] = useState<Record<string, ScriptData>>(initialData.script);
   const [productionDataMap, setProductionDataMap] = useState<Record<string, ProductionData>>(initialData.production);
+  const [aiDataMap, setAiDataMap] = useState<Record<string, AIData>>(initialData.ai);
 
   const [activeProject, setActiveProject] = useState<Project | null>(projects[0] || null);
   const [activeSection, setActiveSection] = useState<string | null>(null);
@@ -156,6 +178,14 @@ export default function App() {
     });
   }, []);
 
+  const handleUpdateAIData = useCallback((projectId: string, data: AIData) => {
+    setAiDataMap((prev) => {
+      const next = { ...prev, [projectId]: data };
+      saveAIData(projectId, data);
+      return next;
+    });
+  }, []);
+
   const handleCreateProject = useCallback(
     (title: string, year: string, description: string) => {
       const newProject: Project = {
@@ -172,6 +202,7 @@ export default function App() {
           { id: 'sources', name: 'Sources', icon: 'FileText', description: 'Primary and secondary source materials', status: 'empty' },
           { id: 'script', name: 'Script', icon: 'PenTool', description: 'Narrative script and scene descriptions', status: 'empty' },
           { id: 'production', name: 'Production', icon: 'Film', description: 'Production planning, characters, locations, and shots', status: 'empty' },
+          { id: 'ai', name: 'AI / Generation', icon: 'Sparkles', description: 'AI generation center for images, video, and voice', status: 'empty' },
           { id: 'characters', name: 'Characters', icon: 'Users', description: 'Key historical figures and their roles', status: 'empty' },
           { id: 'scenes', name: 'Scenes', icon: 'Film', description: 'Scene breakdowns and visual storyboards', status: 'empty' },
           { id: 'voiceover', name: 'Voiceover', icon: 'Mic', description: 'Narration scripts and voice talent notes', status: 'empty' },
@@ -185,6 +216,7 @@ export default function App() {
       const emptyResearch = emptyResearchData();
       const emptyScript = emptyScriptData(title);
       const emptyProduction = emptyProductionData();
+      const emptyAI = emptyAIData();
 
       setProjects((prev) => [newProject, ...prev]);
       setResearchDataMap((prev) => {
@@ -200,6 +232,11 @@ export default function App() {
       setProductionDataMap((prev) => {
         const next = { ...prev, [newProject.id]: emptyProduction };
         saveProductionData(newProject.id, emptyProduction);
+        return next;
+      });
+      setAiDataMap((prev) => {
+        const next = { ...prev, [newProject.id]: emptyAI };
+        saveAIData(newProject.id, emptyAI);
         return next;
       });
 
@@ -228,6 +265,11 @@ export default function App() {
       return next;
     });
     setProductionDataMap((prev) => {
+      const next = { ...prev };
+      delete next[projectId];
+      return next;
+    });
+    setAiDataMap((prev) => {
       const next = { ...prev };
       delete next[projectId];
       return next;
@@ -268,6 +310,8 @@ export default function App() {
               onUpdateScriptData={(data: ScriptData) => handleUpdateScriptData(activeProject.id, data)}
               productionData={productionDataMap[activeProject.id] || null}
               onUpdateProductionData={(data: ProductionData) => handleUpdateProductionData(activeProject.id, data)}
+              aiData={aiDataMap[activeProject.id] || null}
+              onUpdateAIData={(data: AIData) => handleUpdateAIData(activeProject.id, data)}
             />
           ) : (
             <EmptyState onNewProject={handleNewProject} />

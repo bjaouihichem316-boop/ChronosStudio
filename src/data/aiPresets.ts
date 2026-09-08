@@ -1,0 +1,132 @@
+/**
+ * Built-in generation presets for Chronos Studio.
+ * These define reusable templates for different types of documentary content.
+ */
+
+import { GenerationPreset } from '../types/ai';
+
+export const builtInPresets: GenerationPreset[] = [
+  {
+    id: 'preset-historical-cinematic',
+    name: 'Historical Cinematic',
+    description: 'Cinematic historical documentary style with dramatic lighting and composition.',
+    type: 'image',
+    systemInstructions: 'Create a cinematic historical documentary image with dramatic lighting, rich colors, and professional composition. Maintain historical accuracy.',
+    visualDirection: 'Cinematic widescreen composition, dramatic lighting, rich color grading, professional documentary aesthetic',
+    defaultParameters: {
+      quality: 'high',
+      aspectRatio: '16:9',
+    },
+    defaultNegativeConstraints: ['cartoon', 'anime', 'modern elements', 'text', 'watermark'],
+    qualityProfile: 'high',
+    isBuiltIn: true,
+  },
+  {
+    id: 'preset-documentary-interview',
+    name: 'Documentary Interview',
+    description: 'Professional interview setup with natural lighting and clean background.',
+    type: 'video',
+    systemInstructions: 'Create a professional documentary interview shot with natural lighting, shallow depth of field, and clean composition.',
+    visualDirection: 'Professional interview setup, natural lighting, shallow depth of field, clean background, eye-level camera',
+    defaultParameters: {
+      quality: 'standard',
+      aspectRatio: '16:9',
+      duration: 30,
+    },
+    defaultNegativeConstraints: ['dramatic lighting', 'filters', 'text overlays'],
+    qualityProfile: 'standard',
+    isBuiltIn: true,
+  },
+  {
+    id: 'preset-archival-reconstruction',
+    name: 'Archival Reconstruction',
+    description: 'Historical scene reconstruction with archival aesthetic and muted tones.',
+    type: 'image',
+    systemInstructions: 'Reconstruct a historical scene with archival aesthetic, muted color palette, and attention to period-accurate details.',
+    visualDirection: 'Archival aesthetic, muted sepia tones, film grain, period-accurate details, documentary reconstruction style',
+    defaultParameters: {
+      quality: 'high',
+      aspectRatio: '16:9',
+    },
+    defaultNegativeConstraints: ['modern elements', 'bright colors', 'contemporary fashion'],
+    qualityProfile: 'high',
+    isBuiltIn: true,
+  },
+  {
+    id: 'preset-establishing-shot',
+    name: 'Establishing Shot',
+    description: 'Wide establishing shot to set scene and location.',
+    type: 'video',
+    systemInstructions: 'Create a wide establishing shot that sets the scene and location with clear spatial relationships and atmospheric depth.',
+    visualDirection: 'Wide angle, deep focus, atmospheric perspective, clear spatial relationships, cinematic composition',
+    defaultParameters: {
+      quality: 'standard',
+      aspectRatio: '16:9',
+      duration: 10,
+    },
+    defaultNegativeConstraints: ['close-up', 'shallow depth of field', 'text'],
+    qualityProfile: 'standard',
+    isBuiltIn: true,
+  },
+  {
+    id: 'preset-character-portrait',
+    name: 'Character Portrait',
+    description: 'Detailed character portrait with historical accuracy.',
+    type: 'image',
+    systemInstructions: 'Create a detailed character portrait with historical accuracy, appropriate costume, and expressive composition.',
+    visualDirection: 'Character portrait, medium close-up, detailed costume, expressive lighting, historical accuracy',
+    defaultParameters: {
+      quality: 'high',
+      aspectRatio: '3:4',
+    },
+    defaultNegativeConstraints: ['modern clothing', 'anachronistic elements', 'cartoon style'],
+    qualityProfile: 'high',
+    isBuiltIn: true,
+  },
+  {
+    id: 'preset-battle-scene',
+    name: 'Battle Scene',
+    description: 'Dynamic battle or conflict scene with dramatic action.',
+    type: 'video',
+    systemInstructions: 'Create a dynamic battle scene with dramatic action, period-accurate weapons and armor, and cinematic composition.',
+    visualDirection: 'Dynamic action, dramatic lighting, period-accurate details, cinematic composition, epic scale',
+    defaultParameters: {
+      quality: 'high',
+      aspectRatio: '21:9',
+      duration: 20,
+    },
+    defaultNegativeConstraints: ['modern weapons', 'contemporary uniforms', 'blood gore'],
+    qualityProfile: 'high',
+    isBuiltIn: true,
+  },
+  {
+    id: 'preset-architectural-reconstruction',
+    name: 'Architectural Reconstruction',
+    description: 'Detailed architectural visualization of historical buildings.',
+    type: 'image',
+    systemInstructions: 'Create a detailed architectural reconstruction of a historical building with accurate proportions, materials, and period details.',
+    visualDirection: 'Architectural visualization, accurate proportions, period materials, detailed textures, professional rendering',
+    defaultParameters: {
+      quality: 'high',
+      aspectRatio: '16:9',
+    },
+    defaultNegativeConstraints: ['modern architecture', 'incorrect proportions', 'fantasy elements'],
+    qualityProfile: 'high',
+    isBuiltIn: true,
+  },
+  {
+    id: 'preset-map-geographic',
+    name: 'Map / Geographic Visualization',
+    description: 'Clean geographic visualization with historical boundaries.',
+    type: 'image',
+    systemInstructions: 'Create a clean geographic visualization with historical boundaries, clear labels, and professional cartographic style.',
+    visualDirection: 'Clean cartographic style, historical boundaries, clear labels, professional map design, muted color palette',
+    defaultParameters: {
+      quality: 'standard',
+      aspectRatio: '16:9',
+    },
+    defaultNegativeConstraints: ['3D terrain', 'satellite imagery', 'modern borders'],
+    qualityProfile: 'standard',
+    isBuiltIn: true,
+  },
+];
