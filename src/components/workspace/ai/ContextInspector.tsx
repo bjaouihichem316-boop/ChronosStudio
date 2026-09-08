@@ -141,6 +141,86 @@ export default function ContextInspector({
         )}
       </ContextSection>
 
+      {/* Visual Bible Context */}
+      {context.visualBible && (
+        <ContextSection icon={BookOpen} title="Visual Bible (Canonical)">
+          <div className="space-y-3">
+            {/* Visual Canon */}
+            {context.visualBible.visualCanon && (
+              <div className="p-2 bg-[#12132a] rounded-lg">
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Global Visual Canon</p>
+                <div className="space-y-1 text-xs text-gray-300">
+                  {context.visualBible.visualCanon.cinematography && (
+                    <p>Style: {context.visualBible.visualCanon.cinematography.visualStyle}</p>
+                  )}
+                  {context.visualBible.visualCanon.lighting && (
+                    <p>Lighting: {context.visualBible.visualCanon.lighting.philosophy}</p>
+                  )}
+                  {context.visualBible.visualCanon.color && (
+                    <p>Color: {context.visualBible.visualCanon.color.palette}</p>
+                  )}
+                  <p>Historical Accuracy: {context.visualBible.visualCanon.historicalAccuracy}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Character Canons */}
+            {context.visualBible.characters.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider">Character Canons</p>
+                {context.visualBible.characters.map((char) => (
+                  <div key={char.canonId} className="p-2 bg-[#12132a] rounded-lg">
+                    <p className="text-xs text-gray-200 font-medium">{char.canonicalName}</p>
+                    <p className="text-[10px] text-gray-500">{char.historicalRole} • {char.era}</p>
+                    <div className="mt-1 space-y-1">
+                      <p className="text-[10px] text-gray-400">
+                        Age: {char.physicalDescription.ageRange}, Build: {char.physicalDescription.build}
+                      </p>
+                      <p className="text-[10px] text-gray-400">
+                        Clothing: {char.defaultClothing.description}
+                      </p>
+                      {char.activeVisualState && (
+                        <div className="mt-1 p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded">
+                          <p className="text-[10px] text-indigo-300 font-medium">
+                            Active State: {char.activeVisualState.name}
+                          </p>
+                          <p className="text-[10px] text-gray-400">{char.activeVisualState.description}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Location Canon */}
+            {context.visualBible.location && (
+              <div className="p-2 bg-[#12132a] rounded-lg">
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Location Canon</p>
+                <p className="text-xs text-gray-200 font-medium">{context.visualBible.location.canonicalName}</p>
+                <p className="text-[10px] text-gray-500">{context.visualBible.location.historicalPeriod}</p>
+                <div className="mt-1 space-y-1">
+                  <p className="text-[10px] text-gray-400">
+                    Architecture: {context.visualBible.location.architecture.style}
+                  </p>
+                  <p className="text-[10px] text-gray-400">
+                    Materials: {context.visualBible.location.architecture.materials}
+                  </p>
+                  {context.visualBible.location.activeVisualState && (
+                    <div className="mt-1 p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded">
+                      <p className="text-[10px] text-indigo-300 font-medium">
+                        Active State: {context.visualBible.location.activeVisualState.name}
+                      </p>
+                      <p className="text-[10px] text-gray-400">{context.visualBible.location.activeVisualState.description}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </ContextSection>
+      )}
+
       {/* Characters */}
       <ContextSection icon={Users} title="Characters">
         {context.characters.length === 0 ? (

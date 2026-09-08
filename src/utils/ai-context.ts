@@ -12,6 +12,7 @@ import { GenerationContext, GenerationSource, PromptSpec, HistoricalConstraint }
 import { ResearchData } from '../types/research';
 import { ScriptData } from '../types/script';
 import { ProductionData, Shot, ProductionScene, ProductionCharacter, ProductionLocation, ContinuityInfo } from '../types/production';
+import { VisualBibleData, CharacterCanon, LocationCanon } from '../types/visual-bible';
 import { Project } from '../types';
 
 interface BuildContextInput {
@@ -20,6 +21,7 @@ interface BuildContextInput {
   researchData: ResearchData;
   scriptData: ScriptData;
   productionData: ProductionData;
+  visualBibleData?: VisualBibleData;
 }
 
 /**
@@ -27,7 +29,7 @@ interface BuildContextInput {
  * Resolves all related entities by ID and returns structured context.
  */
 export function buildGenerationContext(input: BuildContextInput): GenerationContext {
-  const { project, source, researchData, scriptData, productionData } = input;
+  const { project, source, researchData, scriptData, productionData, visualBibleData } = input;
 
   // Start with project context
   const context: GenerationContext = {
@@ -59,6 +61,7 @@ export function buildGenerationContext(input: BuildContextInput): GenerationCont
     characters: [],
     location: null,
     continuity: null,
+    visualBible: undefined,
   };
 
   // Resolve based on source type
@@ -78,6 +81,11 @@ export function buildGenerationContext(input: BuildContextInput): GenerationCont
     case 'script-scene':
       resolveScriptSceneContext(source.id, scriptData, researchData, context);
       break;
+  }
+
+  // Resolve Visual Bible context
+  if (visualBibleData) {
+    resolveVisualBibleContext(context, visualBibleData, productionData);
   }
 
   return context;
@@ -401,6 +409,105 @@ function resolveLocation(
     atmosphere: location.atmosphere,
     era: location.era,
   };
+}
+
+/**
+ * Resolve Visual Bible context — canonical visual identity.
+ * This is the key architectural change: AI context now consumes Visual Bible
+ * as the canonical source of visual identity, not Production data directly.
+ */
+function resolveVisualBibleContext(
+  context: GenerationContext,
+  visualBibleData: VisualBibleData,
+  productionData: ProductionData
+): void {
+  const visualBible: NonNullable<GenerationContext['visualBible']> = {
+    visualCanon: null,
+    characters: [],
+    location: null,
+  };
+
+  // Resolve visual canon
+  if (visualBibleData.visualCanon) {
+    visualBible.visualCanon = {
+      cinematography: visualBibleData.visualCanon.cinematography,
+      lighting: visualBibleData.visualCanon.lighting,
+      color: visualBibleData.visualCanon.color,
+      texture: visualBibleData.visualCanon.texture,
+      motion: visualBibleData.visualCanon.motion,
+      historicalAccuracy: visualBibleData.visualCanon.historicalAccuracy,
+      modernObjectsPolicy: visualBibleData.visualCanon.modernObjectsPolicy,
+    };
+  }
+
+  // Resolve character canons for characters in context
+  for (const char of context.characters) {
+    const canon = visualBibleData.characterCanons.find(
+      (c) => c.productionCharacterId === char.id
+    );
+    if (!canon) continue;
+
+    // Determine active visual state (use first state or null)
+    const activeState = canon.visualStates.length > 0 ? canon.visualStates[0] : null;
+
+    visualBible.characters.push({
+      productionCharacterId: char.id,
+      canonId: canon.id,
+      canonicalName: canon.canonicalName,
+      historicalRole: canon.historicalRole,
+      era: canon.era,
+      physicalDescription: canon.physicalDescription,
+      defaultClothing: canon.defaultClothing,
+      cinematicIdentity: canon.cinematicIdentity,
+      activeVisualState: activeState
+        ? {
+            id: activeState.id,
+            name: activeState.name,
+            description: activeState.description,
+            period: activeState.period,
+            clothing: activeState.clothing,
+            appearanceChanges: activeState.appearanceChanges,
+            props: activeState.props,
+          }
+        : null,
+      historicalReferences: canon.historicalReferences,
+      continuityRules: canon.continuityRules,
+    });
+  }
+
+  // Resolve location canon for location in context
+  if (context.location) {
+    const canon = visualBibleData.locationCanons.find(
+      (l) => l.productionLocationId === context.location!.id
+    );
+    if (canon) {
+      const activeState = canon.visualStates.length > 0 ? canon.visualStates[0] : null;
+
+      visualBible.location = {
+        productionLocationId: context.location.id,
+        canonId: canon.id,
+        canonicalName: canon.canonicalName,
+        historicalPeriod: canon.historicalPeriod,
+        architecture: canon.architecture,
+        environment: canon.environment,
+        activeVisualState: activeState
+          ? {
+              id: activeState.id,
+              name: activeState.name,
+              description: activeState.description,
+              period: activeState.period,
+              condition: activeState.condition,
+              architectureChanges: activeState.architectureChanges,
+              environmentalChanges: activeState.environmentalChanges,
+            }
+          : null,
+        historicalReferences: canon.historicalReferences,
+        continuityRules: canon.continuityRules,
+      };
+    }
+  }
+
+  context.visualBible = visualBible;
 }
 
 // ─── Prompt Builder ──────────────────────────────────────────────────────────
