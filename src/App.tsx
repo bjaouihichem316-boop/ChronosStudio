@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Project } from './types';
 import { ResearchData } from './types/research';
 import { ScriptData } from './types/script';
+import { ProductionData } from './types/production';
 import { sampleProjects } from './data/sampleProject';
 import { constantinopleResearchData } from './data/researchData';
 import { constantinopleScriptData } from './data/scriptData';
+import { constantinopleProductionData } from './data/productionData';
 import Sidebar from './components/layout/Sidebar';
 import TopNav from './components/layout/TopNav';
 import ProjectOverview from './components/workspace/ProjectOverview';
@@ -30,6 +32,11 @@ export default function App() {
     'proj-001': constantinopleScriptData,
   });
 
+  // Production data per project (keyed by project id)
+  const [productionDataMap, setProductionDataMap] = useState<Record<string, ProductionData>>({
+    'proj-001': constantinopleProductionData,
+  });
+
   const handleSelectProject = (project: Project) => {
     setActiveProject(project);
     setActiveSection(null);
@@ -53,6 +60,10 @@ export default function App() {
 
   const handleUpdateScriptData = (projectId: string, data: ScriptData) => {
     setScriptDataMap((prev) => ({ ...prev, [projectId]: data }));
+  };
+
+  const handleUpdateProductionData = (projectId: string, data: ProductionData) => {
+    setProductionDataMap((prev) => ({ ...prev, [projectId]: data }));
   };
 
   const handleCreateProject = (
@@ -89,6 +100,13 @@ export default function App() {
           name: 'Script',
           icon: 'PenTool',
           description: 'Narrative script and scene descriptions',
+          status: 'empty',
+        },
+        {
+          id: 'production',
+          name: 'Production',
+          icon: 'Film',
+          description: 'Production planning, characters, locations, and shots',
           status: 'empty',
         },
         {
@@ -149,6 +167,18 @@ export default function App() {
       ...prev,
       [newProject.id]: { title: newProject.title, chapters: [], scenes: [], lastSaved: new Date().toISOString() },
     }));
+    // Initialize empty production data for new project
+    setProductionDataMap((prev) => ({
+      ...prev,
+      [newProject.id]: {
+        characters: [],
+        locations: [],
+        scenes: [],
+        shots: [],
+        assets: [],
+        lastSaved: new Date().toISOString(),
+      },
+    }));
   };
 
   return (
@@ -189,6 +219,10 @@ export default function App() {
               scriptData={scriptDataMap[activeProject.id] || null}
               onUpdateScriptData={(data: ScriptData) =>
                 handleUpdateScriptData(activeProject.id, data)
+              }
+              productionData={productionDataMap[activeProject.id] || null}
+              onUpdateProductionData={(data: ProductionData) =>
+                handleUpdateProductionData(activeProject.id, data)
               }
             />
           ) : (

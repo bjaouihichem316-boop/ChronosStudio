@@ -32,6 +32,13 @@ export const sampleProject: Project = {
       status: 'empty',
     },
     {
+      id: 'production',
+      name: 'Production',
+      icon: 'Film',
+      description: 'Production planning, characters, locations, and shots',
+      status: 'in-progress',
+    },
+    {
       id: 'characters',
       name: 'Characters',
       icon: 'Users',

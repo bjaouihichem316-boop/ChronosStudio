@@ -1,6 +1,7 @@
 import { Project, ProjectSection } from '../../types';
 import { ResearchData } from '../../types/research';
 import { ScriptData } from '../../types/script';
+import { ProductionData } from '../../types/production';
 import {
   BookOpen,
   FileText,
@@ -17,6 +18,7 @@ import {
 import ResearchWorkspace from './research/ResearchWorkspace';
 import ResearchProgressIndicator from './research/ResearchProgressIndicator';
 import ScriptWorkspace from './script/ScriptWorkspace';
+import ProductionWorkspace from './production/ProductionWorkspace';
 
 interface ProjectOverviewProps {
   project: Project;
@@ -26,6 +28,8 @@ interface ProjectOverviewProps {
   onUpdateResearchData: (data: ResearchData) => void;
   scriptData: ScriptData | null;
   onUpdateScriptData: (data: ScriptData) => void;
+  productionData: ProductionData | null;
+  onUpdateProductionData: (data: ProductionData) => void;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -48,6 +52,8 @@ export default function ProjectOverview({
   onUpdateResearchData,
   scriptData,
   onUpdateScriptData,
+  productionData,
+  onUpdateProductionData,
 }: ProjectOverviewProps) {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
@@ -97,6 +103,16 @@ export default function ProjectOverview({
               />
             ) : (
               <EmptyScriptSection projectTitle={project.title} />
+            )
+          ) : activeSection === 'production' ? (
+            productionData ? (
+              <ProductionWorkspace
+                data={productionData}
+                scriptData={scriptData}
+                onUpdateData={onUpdateProductionData}
+              />
+            ) : (
+              <EmptyProductionSection projectTitle={project.title} />
             )
           ) : (
             <SectionContent
@@ -393,6 +409,45 @@ function EmptyResearchSection({ projectTitle }: { projectTitle: string }) {
             <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors">
               <Sparkles className="w-4 h-4" />
               Initialize with AI
+            </button>
+            <button className="px-4 py-2 bg-[#22234a] hover:bg-[#2a2b3d] text-gray-300 text-sm font-medium rounded-lg border border-[#2a2b3d] transition-colors">
+              Start Manually
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmptyProductionSection({ projectTitle }: { projectTitle: string }) {
+  return (
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-12 h-12 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center">
+          <Film className="w-6 h-6 text-indigo-400" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-white">Production Studio</h2>
+          <p className="text-sm text-gray-400">Production planning and visual pre-production</p>
+        </div>
+      </div>
+      <div className="bg-[#1a1b2e] border border-[#2a2b3d] rounded-xl p-8">
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#22234a] flex items-center justify-center mx-auto mb-4">
+            <Film className="w-8 h-8 text-gray-500" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-300 mb-2">
+            Production Studio
+          </h3>
+          <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
+            The production studio for <span className="text-gray-400">{projectTitle}</span> is ready to be initialized.
+            Start by creating characters, locations, and production scenes to plan your documentary.
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors">
+              <Sparkles className="w-4 h-4" />
+              Generate with AI
             </button>
             <button className="px-4 py-2 bg-[#22234a] hover:bg-[#2a2b3d] text-gray-300 text-sm font-medium rounded-lg border border-[#2a2b3d] transition-colors">
               Start Manually
