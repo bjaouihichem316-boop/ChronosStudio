@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Project } from './types';
+import { ResearchData } from './types/research';
 import { sampleProjects } from './data/sampleProject';
+import { constantinopleResearchData } from './data/researchData';
 import Sidebar from './components/layout/Sidebar';
 import TopNav from './components/layout/TopNav';
 import ProjectOverview from './components/workspace/ProjectOverview';
@@ -16,6 +18,11 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
 
+  // Research data per project (keyed by project id)
+  const [researchDataMap, setResearchDataMap] = useState<Record<string, ResearchData>>({
+    'proj-001': constantinopleResearchData,
+  });
+
   const handleSelectProject = (project: Project) => {
     setActiveProject(project);
     setActiveSection(null);
@@ -27,6 +34,10 @@ export default function App() {
 
   const handleNewProject = () => {
     setIsNewProjectModalOpen(true);
+  };
+
+  const handleUpdateResearchData = (projectId: string, data: ResearchData) => {
+    setResearchDataMap((prev) => ({ ...prev, [projectId]: data }));
   };
 
   const handleCreateProject = (
@@ -146,6 +157,10 @@ export default function App() {
               project={activeProject}
               activeSection={activeSection}
               onSelectSection={handleSelectSection}
+              researchData={researchDataMap[activeProject.id] || null}
+              onUpdateResearchData={(data) =>
+                handleUpdateResearchData(activeProject.id, data)
+              }
             />
           ) : (
             <EmptyState onNewProject={handleNewProject} />

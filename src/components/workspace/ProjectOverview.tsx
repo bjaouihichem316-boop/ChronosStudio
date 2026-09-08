@@ -1,4 +1,5 @@
 import { Project, ProjectSection } from '../../types';
+import { ResearchData } from '../../types/research';
 import {
   BookOpen,
   FileText,
@@ -12,11 +13,15 @@ import {
   ArrowRight,
   Sparkles,
 } from 'lucide-react';
+import ResearchWorkspace from './research/ResearchWorkspace';
+import ResearchProgressIndicator from './research/ResearchProgressIndicator';
 
 interface ProjectOverviewProps {
   project: Project;
   activeSection: string | null;
   onSelectSection: (sectionId: string) => void;
+  researchData: ResearchData | null;
+  onUpdateResearchData: (data: ResearchData) => void;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -35,6 +40,8 @@ export default function ProjectOverview({
   project,
   activeSection,
   onSelectSection,
+  researchData,
+  onUpdateResearchData,
 }: ProjectOverviewProps) {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
@@ -65,12 +72,23 @@ export default function ProjectOverview({
       {/* Content Area */}
       <div className="flex-1 overflow-y-auto p-6">
         {activeSection ? (
-          <SectionContent
-            section={project.sections.find((s) => s.id === activeSection)!}
-            project={project}
-          />
+          activeSection === 'research' && researchData ? (
+            <ResearchWorkspace
+              data={researchData}
+              onUpdateData={onUpdateResearchData}
+            />
+          ) : (
+            <SectionContent
+              section={project.sections.find((s) => s.id === activeSection)!}
+              project={project}
+            />
+          )
         ) : (
-          <ProjectDashboard project={project} onSelectSection={onSelectSection} />
+          <ProjectDashboard
+            project={project}
+            onSelectSection={onSelectSection}
+            researchData={researchData}
+          />
         )}
       </div>
     </div>
@@ -80,9 +98,11 @@ export default function ProjectOverview({
 function ProjectDashboard({
   project,
   onSelectSection,
+  researchData,
 }: {
   project: Project;
   onSelectSection: (id: string) => void;
+  researchData: ResearchData | null;
 }) {
   const completedSections = project.sections.filter(
     (s) => s.status === 'complete'
@@ -135,6 +155,13 @@ function ProjectDashboard({
           color="emerald"
         />
       </div>
+
+      {/* Research Progress Indicator */}
+      {researchData && (
+        <div className="mb-8">
+          <ResearchProgressIndicator data={researchData} />
+        </div>
+      )}
 
       {/* Section Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
