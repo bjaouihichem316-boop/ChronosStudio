@@ -12,6 +12,7 @@ import { ProductionData } from '../types/production';
 import { AIData } from '../types/ai';
 import { VisualBibleData } from '../types/visual-bible';
 import { PipelineData } from '../types/pipeline';
+import { MediaData } from '../types/media';
 import { Project } from '../types';
 
 // Storage key prefixes
@@ -19,7 +20,7 @@ const STORAGE_PREFIX = 'chronos:project';
 const PROJECTS_KEY = 'chronos:projects';
 
 // Domain keys
-type Domain = 'research' | 'script' | 'production' | 'ai' | 'visual-bible' | 'pipeline';
+type Domain = 'research' | 'script' | 'production' | 'ai' | 'visual-bible' | 'pipeline' | 'media';
 
 /**
  * Build a project-scoped storage key
@@ -137,6 +138,16 @@ export function savePipelineData(projectId: string, data: PipelineData): void {
   safeWrite(buildKey(projectId, 'pipeline'), data);
 }
 
+// ─── Media ───────────────────────────────────────────────────────────────────
+
+export function loadMediaData(projectId: string): MediaData | null {
+  return safeRead<MediaData>(buildKey(projectId, 'media'));
+}
+
+export function saveMediaData(projectId: string, data: MediaData): void {
+  safeWrite(buildKey(projectId, 'media'), data);
+}
+
 // ─── Cleanup ─────────────────────────────────────────────────────────────────
 
 /**
@@ -150,6 +161,7 @@ export function clearProjectData(projectId: string): void {
     localStorage.removeItem(buildKey(projectId, 'ai'));
     localStorage.removeItem(buildKey(projectId, 'visual-bible'));
     localStorage.removeItem(buildKey(projectId, 'pipeline'));
+    localStorage.removeItem(buildKey(projectId, 'media'));
   } catch {
     // Ignore errors
   }
@@ -166,6 +178,7 @@ export function loadProjectData(projectId: string): {
   ai: AIData | null;
   visualBible: VisualBibleData | null;
   pipeline: PipelineData | null;
+  media: MediaData | null;
 } {
   return {
     research: loadResearchData(projectId),
@@ -174,5 +187,6 @@ export function loadProjectData(projectId: string): {
     ai: loadAIData(projectId),
     visualBible: loadVisualBibleData(projectId),
     pipeline: loadPipelineData(projectId),
+    media: loadMediaData(projectId),
   };
 }

@@ -6,6 +6,7 @@ import { ProductionData } from './types/production';
 import { AIData } from './types/ai';
 import { VisualBibleData } from './types/visual-bible';
 import { PipelineData } from './types/pipeline';
+import { MediaData } from './types/media';
 import { sampleProjects } from './data/sampleProject';
 import { constantinopleResearchData } from './data/researchData';
 import { constantinopleScriptData } from './data/scriptData';
@@ -22,6 +23,7 @@ import {
   saveAIData,
   saveVisualBibleData,
   savePipelineData,
+  saveMediaData,
   clearProjectData,
 } from './utils/persistence';
 import Sidebar from './components/layout/Sidebar';
@@ -77,6 +79,15 @@ function emptyPipelineData(): PipelineData {
   };
 }
 
+function emptyMediaData(): MediaData {
+  return {
+    artifacts: [],
+    assets: [],
+    versions: [],
+    lastSaved: new Date().toISOString(),
+  };
+}
+
 /**
  * Initialize the data maps from localStorage, falling back to sample data
  * for the first project if nothing is persisted yet.
@@ -88,6 +99,7 @@ function initializeDataMaps(projects: Project[]): {
   ai: Record<string, AIData>;
   visualBible: Record<string, VisualBibleData>;
   pipeline: Record<string, PipelineData>;
+  media: Record<string, MediaData>;
 } {
   const researchMap: Record<string, ResearchData> = {};
   const scriptMap: Record<string, ScriptData> = {};
@@ -95,6 +107,7 @@ function initializeDataMaps(projects: Project[]): {
   const aiMap: Record<string, AIData> = {};
   const visualBibleMap: Record<string, VisualBibleData> = {};
   const pipelineMap: Record<string, PipelineData> = {};
+  const mediaMap: Record<string, MediaData> = {};
 
   for (const project of projects) {
     const persisted = loadProjectData(project.id);
@@ -148,9 +161,16 @@ function initializeDataMaps(projects: Project[]): {
     } else {
       pipelineMap[project.id] = emptyPipelineData();
     }
+
+    // Media: persisted → empty
+    if (persisted.media) {
+      mediaMap[project.id] = persisted.media;
+    } else {
+      mediaMap[project.id] = emptyMediaData();
+    }
   }
 
-  return { research: researchMap, script: scriptMap, production: productionMap, ai: aiMap, visualBible: visualBibleMap, pipeline: pipelineMap };
+  return { research: researchMap, script: scriptMap, production: productionMap, ai: aiMap, visualBible: visualBibleMap, pipeline: pipelineMap, media: mediaMap };
 }
 
 export default function App() {
@@ -169,6 +189,7 @@ export default function App() {
   const [aiDataMap, setAiDataMap] = useState<Record<string, AIData>>(initialData.ai);
   const [visualBibleDataMap, setVisualBibleDataMap] = useState<Record<string, VisualBibleData>>(initialData.visualBible);
   const [pipelineDataMap, setPipelineDataMap] = useState<Record<string, PipelineData>>(initialData.pipeline);
+  const [mediaDataMap, setMediaDataMap] = useState<Record<string, MediaData>>(initialData.media);
 
   const [activeProject, setActiveProject] = useState<Project | null>(projects[0] || null);
   const [activeSection, setActiveSection] = useState<string | null>(null);
@@ -243,6 +264,14 @@ export default function App() {
     setPipelineDataMap((prev) => {
       const next = { ...prev, [projectId]: data };
       savePipelineData(projectId, data);
+      return next;
+    });
+  }, []);
+
+  const handleUpdateMediaData = useCallback((projectId: string, data: MediaData) => {
+    setMediaDataMap((prev) => {
+      const next = { ...prev, [projectId]: data };
+      saveMediaData(projectId, data);
       return next;
     });
   }, []);
@@ -399,6 +428,8 @@ export default function App() {
               onUpdateVisualBibleData={(data: VisualBibleData) => handleUpdateVisualBibleData(activeProject.id, data)}
               pipelineData={pipelineDataMap[activeProject.id] || null}
               onUpdatePipelineData={(data: PipelineData) => handleUpdatePipelineData(activeProject.id, data)}
+              mediaData={mediaDataMap[activeProject.id] || null}
+              onUpdateMediaData={(data: MediaData) => handleUpdateMediaData(activeProject.id, data)}
             />
           ) : (
             <EmptyState onNewProject={handleNewProject} />
