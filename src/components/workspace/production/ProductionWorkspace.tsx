@@ -308,8 +308,6 @@ export default function ProductionWorkspace({ data, scriptData, onUpdateData }: 
             shots={data.shots}
             characters={data.characters}
             locations={data.locations}
-            onUpdateShot={handleUpdateShot}
-            onReorderShots={handleReorderShots}
           />
         )}
         {activeTab === 'assets' && (
@@ -319,7 +317,6 @@ export default function ProductionWorkspace({ data, scriptData, onUpdateData }: 
             characters={data.characters}
             locations={data.locations}
             onAddAsset={handleAddAsset}
-            onUpdateAsset={handleUpdateAsset}
             onDeleteAsset={handleDeleteAsset}
           />
         )}

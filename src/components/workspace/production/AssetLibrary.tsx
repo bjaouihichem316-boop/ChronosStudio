@@ -2,13 +2,17 @@ import { useState } from 'react';
 import { Asset, AssetType, AssetStatus, ProductionScene, ProductionCharacter, ProductionLocation } from '../../../types/production';
 import { Plus, Search, Pencil, Trash2, Image, FileVideo, Music, Link2, Sparkles } from 'lucide-react';
 
+/**
+ * AssetLibrary — Manage production assets (images, video, audio, references).
+ * Currently supports create and delete. Edit workflow will be added in Stage 5
+ * when AI generation pipeline is integrated.
+ */
 interface AssetLibraryProps {
   assets: Asset[];
   scenes: ProductionScene[];
   characters: ProductionCharacter[];
   locations: ProductionLocation[];
   onAddAsset: (asset: Omit<Asset, 'id' | 'dateCreated' | 'dateModified'>) => void;
-  onUpdateAsset: (asset: Asset) => void;
   onDeleteAsset: (assetId: string) => void;
 }
 
@@ -18,7 +22,6 @@ export default function AssetLibrary({
   characters,
   locations,
   onAddAsset,
-  onUpdateAsset,
   onDeleteAsset,
 }: AssetLibraryProps) {
   const [searchQuery, setSearchQuery] = useState('');

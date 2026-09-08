@@ -1,13 +1,16 @@
 import { ProductionScene, Shot, ProductionCharacter, ProductionLocation } from '../../../types/production';
 import { Clapperboard, Clock, MapPin, Users } from 'lucide-react';
 
+/**
+ * StoryboardView — Read-only visual representation of shots in sequence.
+ * This component is intentionally read-only. Shot editing and reordering
+ * are handled in the Production Scenes tab.
+ */
 interface StoryboardViewProps {
   scenes: ProductionScene[];
   shots: Shot[];
   characters: ProductionCharacter[];
   locations: ProductionLocation[];
-  onUpdateShot: (shot: Shot) => void;
-  onReorderShots: (sceneId: string, shotIds: string[]) => void;
 }
 
 export default function StoryboardView({
