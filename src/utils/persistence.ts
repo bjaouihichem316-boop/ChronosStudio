@@ -9,6 +9,7 @@
 import { ResearchData } from '../types/research';
 import { ScriptData } from '../types/script';
 import { ProductionData } from '../types/production';
+import { AIData } from '../types/ai';
 import { Project } from '../types';
 
 // Storage key prefixes
@@ -16,7 +17,7 @@ const STORAGE_PREFIX = 'chronos:project';
 const PROJECTS_KEY = 'chronos:projects';
 
 // Domain keys
-type Domain = 'research' | 'script' | 'production';
+type Domain = 'research' | 'script' | 'production' | 'ai';
 
 /**
  * Build a project-scoped storage key
@@ -104,6 +105,16 @@ export function saveProductionData(projectId: string, data: ProductionData): voi
   safeWrite(buildKey(projectId, 'production'), data);
 }
 
+// ─── AI ──────────────────────────────────────────────────────────────────────
+
+export function loadAIData(projectId: string): AIData | null {
+  return safeRead<AIData>(buildKey(projectId, 'ai'));
+}
+
+export function saveAIData(projectId: string, data: AIData): void {
+  safeWrite(buildKey(projectId, 'ai'), data);
+}
+
 // ─── Cleanup ─────────────────────────────────────────────────────────────────
 
 /**
@@ -114,6 +125,7 @@ export function clearProjectData(projectId: string): void {
     localStorage.removeItem(buildKey(projectId, 'research'));
     localStorage.removeItem(buildKey(projectId, 'script'));
     localStorage.removeItem(buildKey(projectId, 'production'));
+    localStorage.removeItem(buildKey(projectId, 'ai'));
   } catch {
     // Ignore errors
   }
@@ -127,10 +139,12 @@ export function loadProjectData(projectId: string): {
   research: ResearchData | null;
   script: ScriptData | null;
   production: ProductionData | null;
+  ai: AIData | null;
 } {
   return {
     research: loadResearchData(projectId),
     script: loadScriptData(projectId),
     production: loadProductionData(projectId),
+    ai: loadAIData(projectId),
   };
 }

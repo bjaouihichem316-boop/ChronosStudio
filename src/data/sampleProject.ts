@@ -39,6 +39,13 @@ export const sampleProject: Project = {
       status: 'in-progress',
     },
     {
+      id: 'ai',
+      name: 'AI / Generation',
+      icon: 'Sparkles',
+      description: 'AI generation center for images, video, and voice',
+      status: 'empty',
+    },
+    {
       id: 'characters',
       name: 'Characters',
       icon: 'Users',
