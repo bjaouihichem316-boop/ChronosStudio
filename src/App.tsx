@@ -5,6 +5,7 @@ import { ScriptData } from './types/script';
 import { ProductionData } from './types/production';
 import { AIData } from './types/ai';
 import { VisualBibleData } from './types/visual-bible';
+import { PipelineData } from './types/pipeline';
 import { sampleProjects } from './data/sampleProject';
 import { constantinopleResearchData } from './data/researchData';
 import { constantinopleScriptData } from './data/scriptData';
@@ -20,6 +21,7 @@ import {
   saveProductionData,
   saveAIData,
   saveVisualBibleData,
+  savePipelineData,
   clearProjectData,
 } from './utils/persistence';
 import Sidebar from './components/layout/Sidebar';
@@ -66,6 +68,15 @@ function emptyVisualBibleData(): VisualBibleData {
   };
 }
 
+function emptyPipelineData(): PipelineData {
+  return {
+    pipelines: [],
+    tasks: [],
+    outputs: [],
+    lastSaved: new Date().toISOString(),
+  };
+}
+
 /**
  * Initialize the data maps from localStorage, falling back to sample data
  * for the first project if nothing is persisted yet.
@@ -76,12 +87,14 @@ function initializeDataMaps(projects: Project[]): {
   production: Record<string, ProductionData>;
   ai: Record<string, AIData>;
   visualBible: Record<string, VisualBibleData>;
+  pipeline: Record<string, PipelineData>;
 } {
   const researchMap: Record<string, ResearchData> = {};
   const scriptMap: Record<string, ScriptData> = {};
   const productionMap: Record<string, ProductionData> = {};
   const aiMap: Record<string, AIData> = {};
   const visualBibleMap: Record<string, VisualBibleData> = {};
+  const pipelineMap: Record<string, PipelineData> = {};
 
   for (const project of projects) {
     const persisted = loadProjectData(project.id);
@@ -128,9 +141,16 @@ function initializeDataMaps(projects: Project[]): {
     } else {
       visualBibleMap[project.id] = emptyVisualBibleData();
     }
+
+    // Pipeline: persisted → empty
+    if (persisted.pipeline) {
+      pipelineMap[project.id] = persisted.pipeline;
+    } else {
+      pipelineMap[project.id] = emptyPipelineData();
+    }
   }
 
-  return { research: researchMap, script: scriptMap, production: productionMap, ai: aiMap, visualBible: visualBibleMap };
+  return { research: researchMap, script: scriptMap, production: productionMap, ai: aiMap, visualBible: visualBibleMap, pipeline: pipelineMap };
 }
 
 export default function App() {
@@ -148,6 +168,7 @@ export default function App() {
   const [productionDataMap, setProductionDataMap] = useState<Record<string, ProductionData>>(initialData.production);
   const [aiDataMap, setAiDataMap] = useState<Record<string, AIData>>(initialData.ai);
   const [visualBibleDataMap, setVisualBibleDataMap] = useState<Record<string, VisualBibleData>>(initialData.visualBible);
+  const [pipelineDataMap, setPipelineDataMap] = useState<Record<string, PipelineData>>(initialData.pipeline);
 
   const [activeProject, setActiveProject] = useState<Project | null>(projects[0] || null);
   const [activeSection, setActiveSection] = useState<string | null>(null);
@@ -218,6 +239,14 @@ export default function App() {
     });
   }, []);
 
+  const handleUpdatePipelineData = useCallback((projectId: string, data: PipelineData) => {
+    setPipelineDataMap((prev) => {
+      const next = { ...prev, [projectId]: data };
+      savePipelineData(projectId, data);
+      return next;
+    });
+  }, []);
+
   const handleCreateProject = useCallback(
     (title: string, year: string, description: string) => {
       const newProject: Project = {
@@ -250,6 +279,7 @@ export default function App() {
       const emptyProduction = emptyProductionData();
       const emptyAI = emptyAIData();
       const emptyVisualBible = emptyVisualBibleData();
+      const emptyPipeline = emptyPipelineData();
 
       setProjects((prev) => [newProject, ...prev]);
       setResearchDataMap((prev) => {
@@ -275,6 +305,11 @@ export default function App() {
       setVisualBibleDataMap((prev) => {
         const next = { ...prev, [newProject.id]: emptyVisualBible };
         saveVisualBibleData(newProject.id, emptyVisualBible);
+        return next;
+      });
+      setPipelineDataMap((prev) => {
+        const next = { ...prev, [newProject.id]: emptyPipeline };
+        savePipelineData(newProject.id, emptyPipeline);
         return next;
       });
 
@@ -313,6 +348,11 @@ export default function App() {
       return next;
     });
     setVisualBibleDataMap((prev) => {
+      const next = { ...prev };
+      delete next[projectId];
+      return next;
+    });
+    setPipelineDataMap((prev) => {
       const next = { ...prev };
       delete next[projectId];
       return next;
@@ -357,6 +397,8 @@ export default function App() {
               onUpdateAIData={(data: AIData) => handleUpdateAIData(activeProject.id, data)}
               visualBibleData={visualBibleDataMap[activeProject.id] || null}
               onUpdateVisualBibleData={(data: VisualBibleData) => handleUpdateVisualBibleData(activeProject.id, data)}
+              pipelineData={pipelineDataMap[activeProject.id] || null}
+              onUpdatePipelineData={(data: PipelineData) => handleUpdatePipelineData(activeProject.id, data)}
             />
           ) : (
             <EmptyState onNewProject={handleNewProject} />
