@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Project } from './types';
 import { ResearchData } from './types/research';
+import { ScriptData } from './types/script';
 import { sampleProjects } from './data/sampleProject';
 import { constantinopleResearchData } from './data/researchData';
+import { constantinopleScriptData } from './data/scriptData';
 import Sidebar from './components/layout/Sidebar';
 import TopNav from './components/layout/TopNav';
 import ProjectOverview from './components/workspace/ProjectOverview';
@@ -21,6 +23,11 @@ export default function App() {
   // Research data per project (keyed by project id)
   const [researchDataMap, setResearchDataMap] = useState<Record<string, ResearchData>>({
     'proj-001': constantinopleResearchData,
+  });
+
+  // Script data per project (keyed by project id)
+  const [scriptDataMap, setScriptDataMap] = useState<Record<string, ScriptData>>({
+    'proj-001': constantinopleScriptData,
   });
 
   const handleSelectProject = (project: Project) => {
@@ -42,6 +49,10 @@ export default function App() {
 
   const handleUpdateResearchData = (projectId: string, data: ResearchData) => {
     setResearchDataMap((prev) => ({ ...prev, [projectId]: data }));
+  };
+
+  const handleUpdateScriptData = (projectId: string, data: ScriptData) => {
+    setScriptDataMap((prev) => ({ ...prev, [projectId]: data }));
   };
 
   const handleCreateProject = (
@@ -133,6 +144,11 @@ export default function App() {
       ...prev,
       [newProject.id]: { notes: [], claims: [], sources: [] },
     }));
+    // Initialize empty script data for new project
+    setScriptDataMap((prev) => ({
+      ...prev,
+      [newProject.id]: { title: newProject.title, chapters: [], scenes: [], lastSaved: new Date().toISOString() },
+    }));
   };
 
   return (
@@ -169,6 +185,10 @@ export default function App() {
               researchData={researchDataMap[activeProject.id] || null}
               onUpdateResearchData={(data) =>
                 handleUpdateResearchData(activeProject.id, data)
+              }
+              scriptData={scriptDataMap[activeProject.id] || null}
+              onUpdateScriptData={(data: ScriptData) =>
+                handleUpdateScriptData(activeProject.id, data)
               }
             />
           ) : (
