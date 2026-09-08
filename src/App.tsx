@@ -4,10 +4,12 @@ import { ResearchData } from './types/research';
 import { ScriptData } from './types/script';
 import { ProductionData } from './types/production';
 import { AIData } from './types/ai';
+import { VisualBibleData } from './types/visual-bible';
 import { sampleProjects } from './data/sampleProject';
 import { constantinopleResearchData } from './data/researchData';
 import { constantinopleScriptData } from './data/scriptData';
 import { constantinopleProductionData } from './data/productionData';
+import { constantinopleVisualBibleData } from './data/visualBibleData';
 import { builtInPresets } from './data/aiPresets';
 import {
   loadProjects,
@@ -17,6 +19,7 @@ import {
   saveScriptData,
   saveProductionData,
   saveAIData,
+  saveVisualBibleData,
   clearProjectData,
 } from './utils/persistence';
 import Sidebar from './components/layout/Sidebar';
@@ -54,6 +57,15 @@ function emptyAIData(): AIData {
   };
 }
 
+function emptyVisualBibleData(): VisualBibleData {
+  return {
+    characterCanons: [],
+    locationCanons: [],
+    visualCanon: null,
+    lastSaved: new Date().toISOString(),
+  };
+}
+
 /**
  * Initialize the data maps from localStorage, falling back to sample data
  * for the first project if nothing is persisted yet.
@@ -63,11 +75,13 @@ function initializeDataMaps(projects: Project[]): {
   script: Record<string, ScriptData>;
   production: Record<string, ProductionData>;
   ai: Record<string, AIData>;
+  visualBible: Record<string, VisualBibleData>;
 } {
   const researchMap: Record<string, ResearchData> = {};
   const scriptMap: Record<string, ScriptData> = {};
   const productionMap: Record<string, ProductionData> = {};
   const aiMap: Record<string, AIData> = {};
+  const visualBibleMap: Record<string, VisualBibleData> = {};
 
   for (const project of projects) {
     const persisted = loadProjectData(project.id);
@@ -105,9 +119,18 @@ function initializeDataMaps(projects: Project[]): {
     } else {
       aiMap[project.id] = emptyAIData();
     }
+
+    // Visual Bible: persisted → sample (for proj-001) → empty
+    if (persisted.visualBible) {
+      visualBibleMap[project.id] = persisted.visualBible;
+    } else if (project.id === 'proj-001') {
+      visualBibleMap[project.id] = constantinopleVisualBibleData;
+    } else {
+      visualBibleMap[project.id] = emptyVisualBibleData();
+    }
   }
 
-  return { research: researchMap, script: scriptMap, production: productionMap, ai: aiMap };
+  return { research: researchMap, script: scriptMap, production: productionMap, ai: aiMap, visualBible: visualBibleMap };
 }
 
 export default function App() {
@@ -124,6 +147,7 @@ export default function App() {
   const [scriptDataMap, setScriptDataMap] = useState<Record<string, ScriptData>>(initialData.script);
   const [productionDataMap, setProductionDataMap] = useState<Record<string, ProductionData>>(initialData.production);
   const [aiDataMap, setAiDataMap] = useState<Record<string, AIData>>(initialData.ai);
+  const [visualBibleDataMap, setVisualBibleDataMap] = useState<Record<string, VisualBibleData>>(initialData.visualBible);
 
   const [activeProject, setActiveProject] = useState<Project | null>(projects[0] || null);
   const [activeSection, setActiveSection] = useState<string | null>(null);
@@ -186,6 +210,14 @@ export default function App() {
     });
   }, []);
 
+  const handleUpdateVisualBibleData = useCallback((projectId: string, data: VisualBibleData) => {
+    setVisualBibleDataMap((prev) => {
+      const next = { ...prev, [projectId]: data };
+      saveVisualBibleData(projectId, data);
+      return next;
+    });
+  }, []);
+
   const handleCreateProject = useCallback(
     (title: string, year: string, description: string) => {
       const newProject: Project = {
@@ -217,6 +249,7 @@ export default function App() {
       const emptyScript = emptyScriptData(title);
       const emptyProduction = emptyProductionData();
       const emptyAI = emptyAIData();
+      const emptyVisualBible = emptyVisualBibleData();
 
       setProjects((prev) => [newProject, ...prev]);
       setResearchDataMap((prev) => {
@@ -237,6 +270,11 @@ export default function App() {
       setAiDataMap((prev) => {
         const next = { ...prev, [newProject.id]: emptyAI };
         saveAIData(newProject.id, emptyAI);
+        return next;
+      });
+      setVisualBibleDataMap((prev) => {
+        const next = { ...prev, [newProject.id]: emptyVisualBible };
+        saveVisualBibleData(newProject.id, emptyVisualBible);
         return next;
       });
 
@@ -270,6 +308,11 @@ export default function App() {
       return next;
     });
     setAiDataMap((prev) => {
+      const next = { ...prev };
+      delete next[projectId];
+      return next;
+    });
+    setVisualBibleDataMap((prev) => {
       const next = { ...prev };
       delete next[projectId];
       return next;
@@ -312,6 +355,8 @@ export default function App() {
               onUpdateProductionData={(data: ProductionData) => handleUpdateProductionData(activeProject.id, data)}
               aiData={aiDataMap[activeProject.id] || null}
               onUpdateAIData={(data: AIData) => handleUpdateAIData(activeProject.id, data)}
+              visualBibleData={visualBibleDataMap[activeProject.id] || null}
+              onUpdateVisualBibleData={(data: VisualBibleData) => handleUpdateVisualBibleData(activeProject.id, data)}
             />
           ) : (
             <EmptyState onNewProject={handleNewProject} />
