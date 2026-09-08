@@ -10,6 +10,7 @@ import { ResearchData } from '../types/research';
 import { ScriptData } from '../types/script';
 import { ProductionData } from '../types/production';
 import { AIData } from '../types/ai';
+import { VisualBibleData } from '../types/visual-bible';
 import { Project } from '../types';
 
 // Storage key prefixes
@@ -17,7 +18,7 @@ const STORAGE_PREFIX = 'chronos:project';
 const PROJECTS_KEY = 'chronos:projects';
 
 // Domain keys
-type Domain = 'research' | 'script' | 'production' | 'ai';
+type Domain = 'research' | 'script' | 'production' | 'ai' | 'visual-bible';
 
 /**
  * Build a project-scoped storage key
@@ -115,6 +116,16 @@ export function saveAIData(projectId: string, data: AIData): void {
   safeWrite(buildKey(projectId, 'ai'), data);
 }
 
+// ─── Visual Bible ────────────────────────────────────────────────────────────
+
+export function loadVisualBibleData(projectId: string): VisualBibleData | null {
+  return safeRead<VisualBibleData>(buildKey(projectId, 'visual-bible'));
+}
+
+export function saveVisualBibleData(projectId: string, data: VisualBibleData): void {
+  safeWrite(buildKey(projectId, 'visual-bible'), data);
+}
+
 // ─── Cleanup ─────────────────────────────────────────────────────────────────
 
 /**
@@ -126,6 +137,7 @@ export function clearProjectData(projectId: string): void {
     localStorage.removeItem(buildKey(projectId, 'script'));
     localStorage.removeItem(buildKey(projectId, 'production'));
     localStorage.removeItem(buildKey(projectId, 'ai'));
+    localStorage.removeItem(buildKey(projectId, 'visual-bible'));
   } catch {
     // Ignore errors
   }
@@ -140,11 +152,13 @@ export function loadProjectData(projectId: string): {
   script: ScriptData | null;
   production: ProductionData | null;
   ai: AIData | null;
+  visualBible: VisualBibleData | null;
 } {
   return {
     research: loadResearchData(projectId),
     script: loadScriptData(projectId),
     production: loadProductionData(projectId),
     ai: loadAIData(projectId),
+    visualBible: loadVisualBibleData(projectId),
   };
 }

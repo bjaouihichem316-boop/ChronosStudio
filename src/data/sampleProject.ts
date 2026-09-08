@@ -46,6 +46,13 @@ export const sampleProject: Project = {
       status: 'empty',
     },
     {
+      id: 'visual-bible',
+      name: 'Visual Bible',
+      icon: 'BookOpen',
+      description: 'Canonical visual identity and continuity',
+      status: 'in-progress',
+    },
+    {
       id: 'characters',
       name: 'Characters',
       icon: 'Users',
