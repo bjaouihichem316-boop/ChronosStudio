@@ -5,8 +5,11 @@ import { ProductionData } from '../../../types/production';
 import { VisualBibleData } from '../../../types/visual-bible';
 import { ResearchData } from '../../../types/research';
 import { ScriptData } from '../../../types/script';
+import { MediaData } from '../../../types/media';
 import { executeTask, areDependenciesMet, hasFailedDependency, getReadyTasks, updateTaskDependencyStatus } from '../../../utils/pipelineExecutor';
-import { mockProvider } from '../../../utils/mockProvider';
+import { providerRegistry } from '../../../utils/providerRegistry';
+import { processCompletedTask } from '../../../utils/assetManager';
+import ProviderStatus from './ProviderStatus';
 import {
   Play,
   Pause,
@@ -26,7 +29,9 @@ interface PipelineWorkspaceProps {
   visualBibleData: VisualBibleData;
   researchData: ResearchData;
   scriptData: ScriptData;
+  mediaData: MediaData;
   onUpdateData: (data: PipelineData) => void;
+  onUpdateMediaData: (data: MediaData) => void;
 }
 
 export default function PipelineWorkspace({
@@ -36,7 +41,9 @@ export default function PipelineWorkspace({
   visualBibleData,
   researchData,
   scriptData,
+  mediaData,
   onUpdateData,
+  onUpdateMediaData,
 }: PipelineWorkspaceProps) {
   const [selectedTask, setSelectedTask] = useState<GenerationTask | null>(null);
   const [selectedOutput, setSelectedOutput] = useState<GenerationOutput | null>(null);
@@ -70,8 +77,8 @@ export default function PipelineWorkspace({
     });
 
     try {
-      // Execute task
-      const output = await executeTask(updatedTask, request, mockProvider);
+      // Execute task (provider registry will select best available provider)
+      const output = await executeTask(updatedTask, request);
 
       // Update task to completed
       const completedTask: GenerationTask = {
@@ -83,11 +90,21 @@ export default function PipelineWorkspace({
         outputIds: [output.id],
       };
 
+      // Process completed task to create media artifact and asset
+      const { mediaData: updatedMediaData } = await processCompletedTask(
+        task.projectId,
+        output,
+        mediaData,
+        `Generated ${output.mediaType} - ${new Date().toLocaleString()}`
+      );
+
       onUpdateData({
         ...pipelineData,
         tasks: pipelineData.tasks.map((t) => (t.id === task.id ? completedTask : t)),
         outputs: [...pipelineData.outputs, output],
       });
+
+      onUpdateMediaData(updatedMediaData);
     } catch (error) {
       // Update task to failed
       const failedTask: GenerationTask = {
@@ -189,6 +206,11 @@ export default function PipelineWorkspace({
           <div className="text-2xl font-bold text-red-400">{failedTasks}</div>
           <div className="text-xs text-gray-400">Failed</div>
         </div>
+      </div>
+
+      {/* Provider Status */}
+      <div className="p-6 border-b border-[#2a2b3d]">
+        <ProviderStatus />
       </div>
 
       {/* Content */}

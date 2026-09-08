@@ -1,33 +1,98 @@
 /**
- * Asset Manager — Chronos Studio Stage 8
+ * Asset Manager — Chronos Studio Stage 9
  *
  * Manages the lifecycle of media artifacts and assets.
  * Handles artifact creation from pipeline outputs, versioning, and usage tracking.
+ * Supports both mock and real artifacts from local providers.
  */
 
-import { MediaArtifact, MediaAsset, AssetVersion, MediaData, AssetOrigin } from '../types/media';
+import { MediaArtifact, MediaAsset, AssetVersion, MediaData, AssetOrigin, StorageReference } from '../types/media';
 import { GenerationOutput, MediaType } from '../types/pipeline';
 import { createMockArtifact } from './mockStorage';
+import { indexedDBStorage } from './indexedDBStorage';
+import { LocalCanvasProvider } from './localCanvasProvider';
 
 /**
  * Create a media artifact from a generation output.
+ * Handles both mock and real artifacts based on provider.
  */
-export function createArtifactFromOutput(
+export async function createArtifactFromOutput(
   projectId: string,
   output: GenerationOutput
-): MediaArtifact {
+): Promise<MediaArtifact> {
+  // Check if this is a real artifact from local canvas provider
+  if (output.metadata.providerId === 'local-canvas') {
+    return createRealArtifact(projectId, output);
+  }
+  
+  // Fall back to mock artifact for other providers
   const artifact = createMockArtifact(projectId, output.mediaType, output.output);
-
+  
   // Link to generation source
   artifact.generationSource = {
     outputId: output.id,
     taskId: output.taskId,
     requestId: output.requestId,
   };
-
+  
   return artifact;
 }
 
+/**
+ * Create a real artifact from local canvas provider output.
+ * Retrieves the actual blob and stores it in IndexedDB.
+ */
+async function createRealArtifact(
+  projectId: string,
+  output: GenerationOutput
+): Promise<MediaArtifact> {
+  const now = new Date().toISOString();
+  
+  // Get the blob from the local canvas provider
+  const blob = LocalCanvasProvider.getGeneratedBlob(output.artifactId);
+  if (!blob) {
+    throw new Error('Generated blob not found for artifact: ' + output.artifactId);
+  }
+  
+  // Store in IndexedDB
+  const storageRef = await indexedDBStorage.store(
+    projectId,
+    output.mediaType,
+    blob,
+    `generated-${output.mediaType}-${Date.now()}.png`
+  );
+  
+  // Clean up the temporary blob
+  LocalCanvasProvider.cleanupBlob(output.artifactId);
+  
+  // Parse resolution from output
+  const resolution = output.output.type === 'image' ? output.output.resolution : '1024x1024';
+  const [width, height] = resolution.split('x').map(Number);
+  
+  const artifact: MediaArtifact = {
+    id: output.artifactId,
+    projectId,
+    type: output.mediaType,
+    filename: `generated-${output.mediaType}-${Date.now()}.png`,
+    mimeType: 'image/png',
+    storage: storageRef,
+    metadata: {
+      width,
+      height,
+      format: 'png',
+    },
+    status: 'ready',
+    generationSource: {
+      outputId: output.id,
+      taskId: output.taskId,
+      requestId: output.requestId,
+    },
+    createdAt: now,
+    updatedAt: now,
+  };
+  
+  return artifact;
+}
 /**
  * Create a new media asset.
  */
@@ -190,14 +255,14 @@ export function updateAssetUsage(
 /**
  * Process a completed generation task and create artifact + asset.
  */
-export function processCompletedTask(
+export async function processCompletedTask(
   projectId: string,
   output: GenerationOutput,
   mediaData: MediaData,
   assetName?: string
-): { mediaData: MediaData; artifact: MediaArtifact; asset: MediaAsset; version: AssetVersion } {
+): Promise<{ mediaData: MediaData; artifact: MediaArtifact; asset: MediaAsset; version: AssetVersion }> {
   // Create artifact from output
-  const artifact = createArtifactFromOutput(projectId, output);
+  const artifact = await createArtifactFromOutput(projectId, output);
 
   // Create asset
   const name = assetName || `Generated ${output.mediaType} - ${new Date().toLocaleString()}`;

@@ -1,23 +1,32 @@
 /**
- * Pipeline Executor — Chronos Studio Stage 7
+ * Pipeline Executor — Chronos Studio Stage 9
  *
  * Manages task execution, dependency resolution, and state transitions.
- * Uses the provider abstraction to execute tasks (mock or real).
+ * Uses the provider registry to select and execute tasks.
  */
 
 import { GenerationTask, GenerationOutput, PipelineStatus, IAIProvider, AIExecutionRequest } from '../types/pipeline';
 import { GenerationRequest } from '../types/ai';
+import { providerRegistry } from './providerRegistry';
 import { mockProvider } from './mockProvider';
 
 /**
- * Execute a single task using the provided provider.
+ * Execute a single task using the provider registry.
+ * Automatically selects the best available provider for the task.
  * Returns the generated output or throws an error.
  */
 export async function executeTask(
   task: GenerationTask,
   request: GenerationRequest,
-  provider: IAIProvider = mockProvider
+  provider?: IAIProvider
 ): Promise<GenerationOutput> {
+  // Select provider: use provided, or select best from registry
+  const selectedProvider = provider || await providerRegistry.selectBestProvider(task.mediaType);
+  
+  if (!selectedProvider) {
+    throw new Error(`No available provider for media type: ${task.mediaType}`);
+  }
+
   // Build execution request
   const executionRequest: AIExecutionRequest = {
     taskId: task.id,
@@ -28,7 +37,7 @@ export async function executeTask(
   };
 
   // Execute via provider
-  const result = await provider.execute(executionRequest);
+  const result = await selectedProvider.execute(executionRequest);
 
   if (!result.success || !result.output || !result.artifactId) {
     throw new Error(result.error || 'Task execution failed');
@@ -44,7 +53,7 @@ export async function executeTask(
     output: result.output,
     artifactId: result.artifactId,
     metadata: {
-      providerId: provider.id,
+      providerId: selectedProvider.id,
       modelId: task.modelId || 'default',
       generationTime: result.generationTime,
       seed: task.parameters.seed,

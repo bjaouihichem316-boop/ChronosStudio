@@ -172,7 +172,9 @@ export default function ProjectOverview({
                 visualBibleData={visualBibleData!}
                 researchData={researchData!}
                 scriptData={scriptData!}
+                mediaData={mediaData!}
                 onUpdateData={onUpdatePipelineData}
+                onUpdateMediaData={onUpdateMediaData}
               />
             ) : (
               <EmptyPipelineSection projectTitle={project.title} />
