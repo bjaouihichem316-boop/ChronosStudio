@@ -264,25 +264,26 @@ export default function ResearchNotesPanel({
               <div className="flex items-start justify-between gap-3">
                 <h3 className="text-sm font-semibold text-gray-200">{note.title}</h3>
                 <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    onClick={() => startEditing(note)}
-                    className="p-1.5 text-gray-500 hover:text-indigo-400 rounded-lg hover:bg-[#22234a] transition-colors"
-                    title="Edit"
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(note.id)}
-                    className={`p-1.5 rounded-lg transition-colors ${
-                      deleteConfirm === note.id
-                        ? 'text-red-400 bg-red-500/10'
-                        : 'text-gray-500 hover:text-red-400 hover:bg-[#22234a]'
-                    }`}
-                    title={deleteConfirm === note.id ? 'Click again to confirm' : 'Delete'}
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+          <button
+            onClick={() => startEditing(note)}
+            className="p-1.5 text-gray-500 hover:text-indigo-400 rounded-lg hover:bg-[#22234a] transition-colors"
+            title="Edit"
+            aria-label={`Edit note: ${note.title}`}
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => handleDelete(note.id)}
+            className={`p-1.5 rounded-lg transition-colors ${
+              deleteConfirm === note.id
+                ? 'text-red-400 bg-red-500/10'
+                : 'text-gray-500 hover:text-red-400 hover:bg-[#22234a]'
+            }`}
+            title={deleteConfirm === note.id ? 'Click again to confirm' : 'Delete'}
+            aria-label={deleteConfirm === note.id ? `Confirm delete: ${note.title}` : `Delete note: ${note.title}`}
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>                </div>
               </div>
               <p className="text-xs text-gray-400 leading-relaxed mt-2 whitespace-pre-wrap">
                 {note.content.length > 300 ? note.content.slice(0, 300) + '...' : note.content}

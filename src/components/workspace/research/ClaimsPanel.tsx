@@ -297,6 +297,7 @@ export default function ClaimsPanel({
                           : 'text-gray-500 hover:text-red-400 hover:bg-[#22234a]'
                       }`}
                       title={deleteConfirm === claim.id ? 'Click again to confirm' : 'Delete'}
+                      aria-label={deleteConfirm === claim.id ? `Confirm delete: ${claim.title}` : `Delete claim: ${claim.title}`}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -304,6 +305,7 @@ export default function ClaimsPanel({
                       onClick={() => onSelectClaim(claim)}
                       className="p-1.5 text-gray-500 hover:text-indigo-400 rounded-lg hover:bg-[#22234a] transition-colors"
                       title="View details"
+                      aria-label={`View details: ${claim.title}`}
                     >
                       <ChevronRight className="w-3.5 h-3.5" />
                     </button>

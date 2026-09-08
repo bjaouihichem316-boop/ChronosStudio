@@ -357,6 +357,7 @@ export default function SourcesPanel({
                         : 'text-gray-500 hover:text-red-400 hover:bg-[#22234a]'
                     }`}
                     title={deleteConfirm === source.id ? 'Click again to confirm' : 'Delete'}
+                    aria-label={deleteConfirm === source.id ? `Confirm delete: ${source.title}` : `Delete source: ${source.title}`}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

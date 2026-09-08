@@ -74,6 +74,7 @@ export default function ClaimDetailView({
       <button
         onClick={onBack}
         className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-200 mb-4 transition-colors"
+        aria-label="Back to claims list"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to claims

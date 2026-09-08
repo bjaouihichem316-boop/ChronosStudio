@@ -28,7 +28,14 @@ export default function ResearchProgressIndicator({ data }: ResearchProgressIndi
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full h-2 bg-[#12132a] rounded-full overflow-hidden mb-4">
+      <div
+        className="w-full h-2 bg-[#12132a] rounded-full overflow-hidden mb-4"
+        role="progressbar"
+        aria-valuenow={progressScore}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`Research progress: ${progressScore}%`}
+      >
         <div
           className="h-full bg-gradient-to-r from-indigo-600 to-purple-500 rounded-full transition-all duration-500"
           style={{ width: `${progressScore}%` }}

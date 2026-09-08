@@ -79,12 +79,17 @@ export default function ResearchWorkspace({ data, onUpdateData }: ResearchWorksp
   };
 
   const handleUpdateClaim = (updatedClaim: HistoricalClaim) => {
+    const updatedClaimWithDate = { ...updatedClaim, dateModified: new Date().toISOString() };
     onUpdateData({
       ...data,
       claims: data.claims.map((c) =>
-        c.id === updatedClaim.id ? { ...updatedClaim, dateModified: new Date().toISOString() } : c
+        c.id === updatedClaimWithDate.id ? updatedClaimWithDate : c
       ),
     });
+    // Update selectedClaim if it's the one being edited
+    if (selectedClaim?.id === updatedClaimWithDate.id) {
+      setSelectedClaim(updatedClaimWithDate);
+    }
   };
 
   const handleDeleteClaim = (claimId: string) => {
@@ -120,12 +125,16 @@ export default function ResearchWorkspace({ data, onUpdateData }: ResearchWorksp
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-[#2a2b3d] mb-6">
+      <div className="flex items-center gap-1 border-b border-[#2a2b3d] mb-6" role="tablist" aria-label="Research sections">
         {tabs.map((tab) => {
           const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`panel-${tab.id}`}
               onClick={() => {
                 setActiveTab(tab.id);
                 setSelectedClaim(null);
@@ -135,7 +144,7 @@ export default function ResearchWorkspace({ data, onUpdateData }: ResearchWorksp
                 setIsAddingClaim(false);
               }}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === tab.id
+                isActive
                   ? 'border-indigo-500 text-indigo-300'
                   : 'border-transparent text-gray-400 hover:text-gray-200'
               }`}
@@ -152,48 +161,57 @@ export default function ResearchWorkspace({ data, onUpdateData }: ResearchWorksp
 
       {/* Tab Content */}
       {activeTab === 'notes' && (
-        <ResearchNotesPanel
-          notes={data.notes}
-          onAddNote={handleAddNote}
-          onUpdateNote={handleUpdateNote}
-          onDeleteNote={handleDeleteNote}
-          editingNote={editingNote}
-          setEditingNote={setEditingNote}
-          isAdding={isAddingNote}
-          setIsAdding={setIsAddingNote}
-        />
+        <div role="tabpanel" id="panel-notes" aria-labelledby="tab-notes">
+          <ResearchNotesPanel
+            notes={data.notes}
+            onAddNote={handleAddNote}
+            onUpdateNote={handleUpdateNote}
+            onDeleteNote={handleDeleteNote}
+            editingNote={editingNote}
+            setEditingNote={setEditingNote}
+            isAdding={isAddingNote}
+            setIsAdding={setIsAddingNote}
+          />
+        </div>
       )}
 
       {activeTab === 'claims' && !selectedClaim && (
-        <ClaimsPanel
-          claims={data.claims}
-          sources={data.sources}
-          onSelectClaim={handleSelectClaim}
-          onAddClaim={handleAddClaim}
-          onDeleteClaim={handleDeleteClaim}
-          isAdding={isAddingClaim}
-          setIsAdding={setIsAddingClaim}
-        />
+        <div role="tabpanel" id="panel-claims" aria-labelledby="tab-claims">
+          <ClaimsPanel
+            claims={data.claims}
+            sources={data.sources}
+            onSelectClaim={handleSelectClaim}
+            onAddClaim={handleAddClaim}
+            onDeleteClaim={handleDeleteClaim}
+            isAdding={isAddingClaim}
+            setIsAdding={setIsAddingClaim}
+          />
+        </div>
       )}
 
       {activeTab === 'claims' && selectedClaim && (
-        <ClaimDetailView
-          claim={selectedClaim}
-          sources={data.sources.filter((s) => selectedClaim.sourceIds.includes(s.id))}
-          onBack={() => setSelectedClaim(null)}
-          onUpdateClaim={handleUpdateClaim}
-        />
+        <div role="tabpanel" id="panel-claims">
+          <ClaimDetailView
+            key={selectedClaim.id}
+            claim={selectedClaim}
+            sources={data.sources.filter((s) => selectedClaim.sourceIds.includes(s.id))}
+            onBack={() => setSelectedClaim(null)}
+            onUpdateClaim={handleUpdateClaim}
+          />
+        </div>
       )}
 
       {activeTab === 'sources' && (
-        <SourcesPanel
-          sources={data.sources}
-          claims={data.claims}
-          onAddSource={handleAddSource}
-          onDeleteSource={handleDeleteSource}
-          isAdding={isAddingSource}
-          setIsAdding={setIsAddingSource}
-        />
+        <div role="tabpanel" id="panel-sources" aria-labelledby="tab-sources">
+          <SourcesPanel
+            sources={data.sources}
+            claims={data.claims}
+            onAddSource={handleAddSource}
+            onDeleteSource={handleDeleteSource}
+            isAdding={isAddingSource}
+            setIsAdding={setIsAddingSource}
+          />
+        </div>
       )}
     </div>
   );

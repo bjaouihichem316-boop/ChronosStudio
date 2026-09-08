@@ -26,6 +26,10 @@ export default function App() {
   const handleSelectProject = (project: Project) => {
     setActiveProject(project);
     setActiveSection(null);
+    // Close sidebar on mobile after selection
+    if (window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
+    }
   };
 
   const handleSelectSection = (sectionId: string) => {
@@ -124,6 +128,11 @@ export default function App() {
     setProjects((prev) => [newProject, ...prev]);
     setActiveProject(newProject);
     setActiveSection(null);
+    // Initialize empty research data for new project
+    setResearchDataMap((prev) => ({
+      ...prev,
+      [newProject.id]: { notes: [], claims: [], sources: [] },
+    }));
   };
 
   return (
@@ -151,7 +160,7 @@ export default function App() {
         </div>
 
         {/* Workspace */}
-        <main className="flex-1 flex flex-col overflow-hidden bg-[#0f1021]">
+        <main className="flex-1 flex flex-col overflow-hidden bg-[#0f1021]" aria-label="Project workspace">
           {activeProject ? (
             <ProjectOverview
               project={activeProject}
