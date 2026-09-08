@@ -11,6 +11,7 @@ import {
 import { ResearchData } from '../../../types/research';
 import { ScriptData } from '../../../types/script';
 import { ProductionData } from '../../../types/production';
+import { VisualBibleData } from '../../../types/visual-bible';
 import { Project } from '../../../types';
 import { buildGenerationContext, buildPromptSpec } from '../../../utils/ai-context';
 import { validateGenerationRequest } from '../../../utils/ai-validation';
@@ -22,6 +23,7 @@ interface RequestCreatorProps {
   researchData: ResearchData;
   scriptData: ScriptData;
   productionData: ProductionData;
+  visualBibleData?: VisualBibleData;
   onCreateRequest: (request: GenerationRequest) => void;
   onCancel: () => void;
 }
@@ -31,6 +33,7 @@ export default function RequestCreator({
   researchData,
   scriptData,
   productionData,
+  visualBibleData,
   onCreateRequest,
   onCancel,
 }: RequestCreatorProps) {
@@ -56,11 +59,12 @@ export default function RequestCreator({
         researchData,
         scriptData,
         productionData,
+        visualBibleData,
       });
     } catch {
       return null;
     }
-  }, [project, source, researchData, scriptData, productionData, sourceId]);
+  }, [project, source, researchData, scriptData, productionData, visualBibleData, sourceId]);
 
   // Build prompt from context
   const prompt: PromptSpec | null = useMemo(() => {

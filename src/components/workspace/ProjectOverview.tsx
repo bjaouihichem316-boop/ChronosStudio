@@ -134,6 +134,7 @@ export default function ProjectOverview({
                 researchData={researchData!}
                 scriptData={scriptData!}
                 productionData={productionData!}
+                visualBibleData={visualBibleData!}
                 onUpdateData={onUpdateAIData}
               />
             ) : (

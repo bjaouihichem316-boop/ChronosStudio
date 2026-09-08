@@ -234,6 +234,144 @@ export interface GenerationContext {
     locationState: string;
     notes: string;
   } | null;
+
+  /** Visual Bible context — canonical visual identity */
+  visualBible?: {
+    /** Global visual canon rules */
+    visualCanon: {
+      cinematography: {
+        visualStyle: string;
+        lensLanguage: string;
+        framingPrinciples: string;
+        cameraMovement: string;
+        depthOfField: string;
+        compositionRules: string;
+      } | null;
+      lighting: {
+        philosophy: string;
+        contrast: string;
+        naturalLightRules: string;
+        artificialLightRules: string;
+        interiorRules: string;
+        exteriorRules: string;
+        timeOfDayRules: string;
+      } | null;
+      color: {
+        palette: string;
+        saturation: string;
+        contrast: string;
+        historicalTreatment: string;
+        reconstructionTreatment: string;
+      } | null;
+      texture: {
+        filmGrain: string;
+        realismLevel: string;
+        environmentalTexture: string;
+        archivalTreatment: string;
+      } | null;
+      motion: {
+        documentaryRealism: string;
+        cameraMovementPhilosophy: string;
+        pacing: string;
+      } | null;
+      historicalAccuracy: string;
+      modernObjectsPolicy: string;
+    } | null;
+
+    /** Character canons resolved from production characters */
+    characters: Array<{
+      productionCharacterId: string;
+      canonId: string;
+      canonicalName: string;
+      historicalRole: string;
+      era: string;
+      physicalDescription: {
+        ageRange: string;
+        height: string;
+        build: string;
+        hair: string;
+        facialFeatures: string;
+        skinTone: string;
+        distinguishingFeatures: string;
+      };
+      defaultClothing: {
+        description: string;
+        materials: string;
+        colors: string;
+        accessories: string;
+        historicalAccuracy: string;
+      };
+      cinematicIdentity: {
+        screenPresence: string;
+        typicalExpressions: string;
+        posture: string;
+        movementStyle: string;
+        emotionalRange: string;
+        visualArchetype: string;
+      };
+      activeVisualState: {
+        id: string;
+        name: string;
+        description: string;
+        period: string;
+        clothing: {
+          description: string;
+          materials: string;
+          colors: string;
+          accessories: string;
+          historicalAccuracy: string;
+        };
+        appearanceChanges: string;
+        props: string[];
+      } | null;
+      historicalReferences: Array<{
+        claimId: string;
+        sourceIds: string[];
+        certainty: string;
+        notes: string;
+      }>;
+      continuityRules: string;
+    }>;
+
+    /** Location canon resolved from production location */
+    location: {
+      productionLocationId: string;
+      canonId: string;
+      canonicalName: string;
+      historicalPeriod: string;
+      architecture: {
+        style: string;
+        materials: string;
+        structures: string;
+        colors: string;
+        distinguishingFeatures: string;
+        historicalAccuracy: string;
+      };
+      environment: {
+        geography: string;
+        climate: string;
+        timeOfDay: string;
+        atmosphere: string;
+        soundscape: string;
+      };
+      activeVisualState: {
+        id: string;
+        name: string;
+        description: string;
+        period: string;
+        condition: string;
+        architectureChanges: string;
+        environmentalChanges: string;
+      } | null;
+      historicalReferences: Array<{
+        claimId: string;
+        sourceIds: string[];
+        certainty: string;
+        notes: string;
+      }>;
+      continuityRules: string;
+    } | null;
+  };
 }
 
 // ─── Generation Request ──────────────────────────────────────────────────────

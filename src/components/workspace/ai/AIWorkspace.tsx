@@ -3,6 +3,7 @@ import { AIData, GenerationRequest, GenerationJob } from '../../../types/ai';
 import { ResearchData } from '../../../types/research';
 import { ScriptData } from '../../../types/script';
 import { ProductionData } from '../../../types/production';
+import { VisualBibleData } from '../../../types/visual-bible';
 import { Project } from '../../../types';
 import { Sparkles, FileText, Briefcase, Eye, Settings } from 'lucide-react';
 import AIOverview from './AIOverview';
@@ -19,6 +20,7 @@ interface AIWorkspaceProps {
   researchData: ResearchData;
   scriptData: ScriptData;
   productionData: ProductionData;
+  visualBibleData?: VisualBibleData;
   onUpdateData: (data: AIData) => void;
 }
 
@@ -28,6 +30,7 @@ export default function AIWorkspace({
   researchData,
   scriptData,
   productionData,
+  visualBibleData,
   onUpdateData,
 }: AIWorkspaceProps) {
   const [activeTab, setActiveTab] = useState<AITab>('overview');
@@ -199,6 +202,7 @@ export default function AIWorkspace({
           researchData={researchData}
           scriptData={scriptData}
           productionData={productionData}
+          visualBibleData={visualBibleData}
           onCreateRequest={handleCreateRequest}
           onCancel={() => setIsCreatingRequest(false)}
         />
